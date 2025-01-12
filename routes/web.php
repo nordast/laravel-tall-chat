@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Livewire\Volt\Volt;
 
 Route::view('/', 'welcome');
 
@@ -14,4 +15,6 @@ Route::view('profile', 'profile')
 
 require __DIR__.'/auth.php';
 
-Route::get('/chat', \App\Livewire\Chat\Index::class)->name('chat.index');
+//Route::get('/chat', \App\Livewire\Chat\Index::class)->name('chat.index');
+
+Volt::route('/chat', 'chat.index')->name('chat.index');
