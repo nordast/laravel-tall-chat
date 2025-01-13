@@ -17,4 +17,6 @@ require __DIR__.'/auth.php';
 
 
 Volt::route('/chat', 'chat.index')->name('chat.index');
-Volt::route('/chat/{query}', 'chat.chat')->name('chat');
+Volt::route('/chat/{query}', 'chat.chat')->name('chat.view');
+
+Volt::route('/users', 'users')->name('users.index');
