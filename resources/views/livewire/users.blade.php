@@ -11,7 +11,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function mount()
     {
-        $this->users = User::where('id', '!=', auth()->id())->get()
+        $this->users = User::where('id', '!=', auth()->id())->get();
     }
 
     public function message($userId)
@@ -30,7 +30,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         if ($existingConversation) {
             // Conversation already exists, redirect to existing conversation
-            return redirect()->route('chat', ['query' => $existingConversation->id]);
+            return redirect()->route('chat.view', ['query' => $existingConversation->id]);
         }
 
         // Create new conversation
@@ -39,7 +39,7 @@ new #[Layout('layouts.app')] class extends Component {
             'receiver_id' => $userId,
         ]);
 
-        return redirect()->route('chat', ['query' => $createdConversation->id]);
+        return redirect()->route('chat.view', ['query' => $createdConversation->id]);
     }
 }; ?>
 
