@@ -15,8 +15,9 @@ Route::view('profile', 'profile')
 
 require __DIR__.'/auth.php';
 
+Route::middleware('auth')->group(function () {
+    Volt::route('/chat', 'chat.index')->name('chat.index');
+    Volt::route('/chat/{query}', 'chat.chat')->name('chat.view');
 
-Volt::route('/chat', 'chat.index')->name('chat.index');
-Volt::route('/chat/{query}', 'chat.chat')->name('chat.view');
-
-Volt::route('/users', 'users')->name('users.index');
+    Volt::route('/users', 'users')->name('users.index');
+});
