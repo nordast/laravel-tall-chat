@@ -14,7 +14,7 @@ new #[Layout('layouts.app')] class extends Component {
     </div>
 
     <div class="grid w-full border-l h-full relative overflow-y-auto" style="contain:content">
-        Messages
+        <livewire:chat.box/>
     </div>
 
 </div>
