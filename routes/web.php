@@ -15,6 +15,6 @@ Route::view('profile', 'profile')
 
 require __DIR__.'/auth.php';
 
-//Route::get('/chat', \App\Livewire\Chat\Index::class)->name('chat.index');
 
 Volt::route('/chat', 'chat.index')->name('chat.index');
+Volt::route('/chat/{query}', 'chat.chat')->name('chat');
