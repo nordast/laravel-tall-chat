@@ -3,7 +3,15 @@
 use Livewire\Volt\Component;
 
 new class extends Component {
-    //
+
+    public $selectedConversation;
+    public $conversation;
+
+    public function mount($selectedConversation)
+    {
+
+    }
+
 }; ?>
 
 <div class="w-full overflow-hidden">
