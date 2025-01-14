@@ -9,7 +9,7 @@ new class extends Component {
 
     public $conversations;
 
-    public function mount($selectedConversation, $query)
+    public function mount($selectedConversation = null, $query = '')
     {
         $this->selectedConversation = $selectedConversation;
         $this->query = $query;

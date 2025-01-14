@@ -28,10 +28,16 @@ new class extends Component {
 
                 {{-- avatar --}}
                 <div class="shrink-0">
-                    <x-avatar class="h-9 w-9 lg:w-11 lg:h-11" />
+                    <x-avatar class="h-9 w-9 lg:w-11 lg:h-11" src="https://i.pravatar.cc/300?img={{ $selectedConversation->getReceiver()->id }}" />
                 </div>
 
-                <h6 class="font-bold truncate"> Name </h6>
+                <h6 class="font-bold truncate">
+                    {{ $selectedConversation->getReceiver()->name }}
+
+                    <p class="text-xs text-gray-500">
+                        {{ $selectedConversation->getReceiver()->email }}
+                    </p>
+                </h6>
             </div>
         </header>
 
