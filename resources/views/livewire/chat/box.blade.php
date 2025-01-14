@@ -40,12 +40,12 @@ new class extends Component {
         #push the message
         $this->loadedMessages->push($createdMessage);
 
-//        #update conversation model
-//        $this->selectedConversation->updated_at = now();
-//        $this->selectedConversation->save();
-//
-//        #refresh chatlist
-//        $this->emitTo('chat.chat-list', 'refresh');
+        #update conversation model
+        $this->selectedConversation->updated_at = now();
+        $this->selectedConversation->save();
+
+        #refresh chat list
+        $this->dispatch('refresh')->to('chat.list');
     }
 
 }; ?>

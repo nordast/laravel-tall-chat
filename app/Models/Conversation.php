@@ -69,6 +69,7 @@ class Conversation extends Model
     {
         return Message::where('conversation_id', '=', $this->id)
             ->where('receiver_id', auth()->user()->id)
-            ->whereNull('read_at')->count();
+            ->whereNull('read_at')
+            ->count();
     }
 }
