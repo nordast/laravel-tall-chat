@@ -8,10 +8,16 @@ new class extends Component {
     public $selectedConversation;
     public $conversation;
     public $body;
+    public $loadedMessages;
 
     public function mount($selectedConversation)
     {
+        $this->loadMessages();
+    }
 
+    public function loadMessages()
+    {
+        $this->loadedMessages = Message::where('conversation_id', $this->selectedConversation->id)->get();
     }
 
     public function sendMessage()
@@ -63,8 +69,7 @@ new class extends Component {
 
                 {{-- avatar --}}
                 <div class="shrink-0">
-                    <x-avatar class="h-9 w-9 lg:w-11 lg:h-11"
-                              src="https://i.pravatar.cc/300?img={{ $selectedConversation->getReceiver()->id }}" />
+                    <x-avatar class="h-9 w-9 lg:w-11 lg:h-11" src="https://i.pravatar.cc/300?img={{ $selectedConversation->getReceiver()->id }}" />
                 </div>
 
                 <h6 class="font-bold truncate">
@@ -78,59 +83,71 @@ new class extends Component {
         </header>
 
         {{-- body --}}
-        <main
-            class="flex flex-col gap-3 p-2.5 overflow-y-auto  flex-grow overscroll-contain overflow-x-hidden w-full my-auto">
-            <div @class(['max-w-[85%] md:max-w-[78%] flex w-auto gap-2 relative mt-2'])>
+        <main class="flex flex-col gap-3 p-2.5 overflow-y-auto  flex-grow overscroll-contain overflow-x-hidden w-full my-auto">
+            @if ($loadedMessages)
+                @foreach ($loadedMessages as $key => $message)
 
-                {{-- avatar --}}
-                <div @class(['shrink-0'])>
-                    <x-avatar />
-                </div>
 
-                {{-- messsage body --}}
-                <div @class(['flex flex-wrap text-[15px]  rounded-xl p-2.5 flex flex-col text-black bg-[#f6f6f8fb]',
-                     'rounded-bl-none border  border-gray-200/40 ' => false,
-                     'rounded-br-none bg-blue-500/80 text-white' => true
-                ])>
-                    <p class="whitespace-normal truncate text-sm md:text-base tracking-wide lg:tracking-normal">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Enim, excepturi?
-                    </p>
+                    <div @class([
+                        'max-w-[85%] md:max-w-[78%] flex w-auto gap-2 relative mt-2',
+                        'ml-auto' => $message->sender_id === auth()->id(),
+                    ])>
 
-                    <div class="ml-auto flex gap-2">
-                        <p @class([
-                            'text-xs ',
-                            'text-gray-500' => false,
-                            'text-white' => true,
+                        {{-- avatar --}}
+                        <div @class(['shrink-0'])>
+                            <x-avatar src="https://i.pravatar.cc/300?img={{ $message->sender_id }}" />
+                        </div>
+
+                        {{-- messsage body --}}
+                        <div @class(['flex flex-wrap text-[15px]  rounded-xl p-2.5 flex flex-col text-black bg-[#f6f6f8fb]',
+                             'rounded-bl-none border border-gray-200/40 ' => !($message->sender_id === auth()->id()),
+                             'rounded-br-none bg-blue-500/80 text-white' => $message->sender_id === auth()->id()
                         ])>
-                            time
-                        </p>
+                            <p class="whitespace-normal truncate text-sm md:text-base tracking-wide lg:tracking-normal">
+                                {{ $message->body }}
+                            </p>
 
-                        {{-- message status , only show if message belongs auth --}}
-                        <div>
-                            {{-- double ticks --}}
-                            <span @class(['text-gray-200'])>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                     class="bi bi-check2-all" viewBox="0 0 16 16">
-                                    <path
-                                        d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z" />
-                                    <path d="m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708z" />
-                                </svg>
-                            </span>
+                            <div class="ml-auto flex gap-2">
+                                <p @class([
+                                    'text-xs ',
+                                    'text-gray-500' => !($message->sender_id === auth()->id()),
+                                    'text-white' => $message->sender_id === auth()->id(),
+                                ])>
+                                    {{ $message->created_at->format('g:i a') }}
+                                </p>
 
-                            {{-- single ticks --}}
-                            {{--
-                            <span @class(['text-gray-200'])>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
-                                    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-                                </svg>
-                            </span>
-                            --}}
+                                {{-- message status , only show if message belongs auth --}}
+                                @if ($message->sender_id === auth()->id())
+                                    <div>
+
+                                        @if($message->isRead())
+                                            {{-- double ticks --}}
+                                            <span @class(['text-gray-200'])>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-all" viewBox="0 0 16 16">
+                                                    <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z" />
+                                                    <path d="m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708z" />
+                                                </svg>
+                                            </span>
+                                        @else
+                                            {{-- single ticks --}}
+                                            <span @class(['text-gray-200'])>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
+                                                    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                                </svg>
+                                            </span>
+                                        @endif
+
+                                    </div>
+                                @endif
+
+
+                            </div>
                         </div>
 
                     </div>
-                </div>
 
-            </div>
+                @endforeach
+            @endif
         </main>
 
         {{-- send message  --}}
