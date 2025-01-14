@@ -33,27 +33,38 @@ new class extends Component {
         ]);
 
         $this->reset('body');
-        dd($createdMessage);
 
-/*
         #scroll to bottom
-        $this->dispatchBrowserEvent('scroll-bottom');
+        $this->dispatch('scroll-bottom');
 
         #push the message
         $this->loadedMessages->push($createdMessage);
 
-        #update conversation model
-        $this->selectedConversation->updated_at = now();
-        $this->selectedConversation->save();
-
-        #refresh chatlist
-        $this->emitTo('chat.chat-list', 'refresh');
-        */
+//        #update conversation model
+//        $this->selectedConversation->updated_at = now();
+//        $this->selectedConversation->save();
+//
+//        #refresh chatlist
+//        $this->emitTo('chat.chat-list', 'refresh');
     }
 
 }; ?>
 
-<div class="w-full overflow-hidden">
+<div
+    x-data="{
+        height: 0,
+        conversationElement: document.getElementById('conversation'),
+        markAsRead: null
+    }"
+    x-init="
+        height = conversationElement.scrollHeight;
+        $nextTick(() => conversationElement.scrollTop = height);
+    "
+    @scroll-bottom.window="
+        $nextTick(() => conversationElement.scrollTop = conversationElement.scrollHeight);
+    "
+    class="w-full overflow-hidden"
+>
     <div class="border-b flex flex-col overflow-y-scroll grow h-full">
 
         {{-- header --}}
@@ -83,10 +94,22 @@ new class extends Component {
         </header>
 
         {{-- body --}}
-        <main class="flex flex-col gap-3 p-2.5 overflow-y-auto  flex-grow overscroll-contain overflow-x-hidden w-full my-auto">
+        <main
+            id="conversation"
+            class="flex flex-col gap-3 p-2.5 overflow-y-auto  flex-grow overscroll-contain overflow-x-hidden w-full my-auto"
+        >
             @if ($loadedMessages)
-                @foreach ($loadedMessages as $key => $message)
+                @php
+                    $previousMessage = null;
+                @endphp
 
+                @foreach ($loadedMessages as $key => $message)
+                    {{-- keep track of the previous message --}}
+                    @if ($key > 0)
+                        @php
+                            $previousMessage = $loadedMessages->get($key - 1)
+                        @endphp
+                    @endif
 
                     <div @class([
                         'max-w-[85%] md:max-w-[78%] flex w-auto gap-2 relative mt-2',
@@ -94,7 +117,11 @@ new class extends Component {
                     ])>
 
                         {{-- avatar --}}
-                        <div @class(['shrink-0'])>
+                        <div @class([
+                            'shrink-0',
+                            'invisible' => $previousMessage?->sender_id === $message->sender_id,
+                            'hidden' => $message->sender_id === auth()->id()
+                        ])>
                             <x-avatar src="https://i.pravatar.cc/300?img={{ $message->sender_id }}" />
                         </div>
 
@@ -155,7 +182,7 @@ new class extends Component {
             <div class="p-2 border-t">
                 <form
                     x-data="{
-                        body: @entangle('body').defer,
+                        body: @entangle('body'),
                     }"
                     @submit.prevent="$wire.sendMessage"
                     method="POST"
