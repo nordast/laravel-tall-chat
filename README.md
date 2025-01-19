@@ -4,6 +4,7 @@
 ## Tech Stack
 
 - Laravel 11
+- Alpine.js
 - TailwindCSS
 
 
